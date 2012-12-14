@@ -6,7 +6,7 @@ from django.views.generic.simple import direct_to_template
 from gcm.models import Device
 
 @csrf_exempt
-def device(request):
+def register(request):
     """
     Register device
 
@@ -15,9 +15,10 @@ def device(request):
         device_id - unique device id
     """
     device_id = request.POST.get('device_id', None)
-    if device_id:
+    if device_id is not None:
         device, created = Device.objects.get_or_create(dev_id=device_id)
         device.reg_id = request.POST.get('reg_id')
         device.save()
 
     return HttpResponse()
+
