@@ -7,8 +7,10 @@ def send_gcm_message(api_key, reg_id, data, collapse_key=None):
     values = {
         "registration_id": reg_id,
         "collapse_key": collapse_key,
-        "data": data
     }
+
+    for k, v in data.items():
+        values["data.%s" % k] = v.encode('utf-8')
 
     data = urllib.urlencode(values)
 
