@@ -1,9 +1,9 @@
-# -*- encoding: utf-8 -*-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from gcm.api import send_gcm_message
+
 
 class Device(models.Model):
 
@@ -22,15 +22,9 @@ class Device(models.Model):
         verbose_name_plural = _("Devices")
         ordering = ['-modified_date']
 
-    @property
-    def is_registered(self):
-        """
-        Check if we can send message to this device
-        """
-        pass
-
     def send_message(self, msg):
-        """
-        Send message to current device
-        """
-        return send_gcm_message(api_key=settings.GCM_APIKEY, reg_id=self.reg_id, data={'msg': msg}, collapse_key="message")
+        return send_gcm_message(
+            api_key=settings.GCM_APIKEY,
+            reg_id=self.reg_id,
+            data={'msg': msg},
+            collapse_key="message")

@@ -7,12 +7,12 @@ class Command(BaseCommand):
     help = 'Send message through gcm api'
 
     option_list = BaseCommand.option_list + (
-        make_option('--devices',
+        make_option(
+            '--devices',
             action='store_true',
             dest='devices',
             default=False,
-            help='List of available devices'),
-        )
+            help='List of available devices'),)
 
     def handle(self, *args, **options):
 
@@ -29,7 +29,8 @@ class Command(BaseCommand):
                 id = args[0]
                 message = args[1]
             except IndexError:
-                raise CommandError("Invalid params. You have to put all params: python manage.py messanger <device_id> <msg>")
+                raise CommandError(
+                    "Invalid params. You have to put all params: python manage.py messanger <device_id> <msg>")
 
             try:
                 device = Device.objects.get(pk=int(id), is_active=True)

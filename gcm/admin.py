@@ -1,7 +1,7 @@
-# -*- encoding: utf-8 -*-
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from gcm.models import Device
+
 
 class DeviceAdmin(admin.ModelAdmin):
     list_display = ['dev_id', 'name', 'modified_date', 'is_active']

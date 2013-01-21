@@ -1,6 +1,6 @@
-# -*- encoding: utf-8 -*-
 import urllib
 import urllib2
+
 
 def send_gcm_message(api_key, reg_id, data, collapse_key=None):
 
