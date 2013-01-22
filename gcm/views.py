@@ -1,7 +1,7 @@
-# -*- encoding: utf-8 -*-
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from gcm.models import Device
+
 
 @csrf_exempt
 def register(request):
@@ -19,4 +19,3 @@ def register(request):
         device.save()
 
     return HttpResponse()
-
