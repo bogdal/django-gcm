@@ -26,6 +26,7 @@ setup(
         'Topic :: Utilities'],
     zip_safe=False,
     install_requires=[
-        '',
+        'django-tastypie>=0.9.12-alpha',
     ],
+    dependency_links=['https://github.com/toastdriven/django-tastypie/tarball/master#egg=django-tastypie-0.9.12-alpha'],
 )

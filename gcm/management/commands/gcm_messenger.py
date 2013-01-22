@@ -2,6 +2,7 @@ from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 from gcm.models import Device
 
+
 class Command(BaseCommand):
     args = '<device_id message>'
     help = 'Send message through gcm api'
