@@ -1,6 +1,6 @@
 django-gcm
 ==========
-[![Build Status](https://travis-ci.org/bogdal/django-gcm.png?branch=master)](undefined)
+[![Build Status](https://travis-ci.org/bogdal/django-gcm.png?branch=master)](https://travis-ci.org/bogdal/django-gcm)
 
 Google Cloud Messaging Server in Django
 
