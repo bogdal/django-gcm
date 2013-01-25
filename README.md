@@ -13,6 +13,13 @@ Install the package via ``pip``
     
 Add <code>gcm</code> to <code>INSTALLED_APPS</code> in <code>settings.py</code>
 
+Add <code>GCM_APIKEY</code> to <code>settings.py</code> file:
+
+```python
+    GCM_APIKEY = "<api_key>"
+```
+
+
 Add <code>gcm urls</code> to <code>urls.py</code> file:
 
 ```python
