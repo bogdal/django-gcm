@@ -7,16 +7,16 @@ Google Cloud Messaging Server in Django
 Quickstart
 -------
 
-Install the package via ``pip``
+Install the package via ``pip``:
 
-    pip install git+git://github.com/bogdal/django-gcm.git
+    pip install django-gcm
     
 Add <code>gcm</code> to <code>INSTALLED_APPS</code> in <code>settings.py</code>
 
 Add <code>GCM_APIKEY</code> to <code>settings.py</code> file:
 
 ```python
-    GCM_APIKEY = "<api_key>"
+GCM_APIKEY = "<api_key>"
 ```
 
 
@@ -29,4 +29,10 @@ Add <code>gcm urls</code> to <code>urls.py</code> file:
       ...
   )
 ```
+
+Client
+------
+
+Simple client application you can find <a href='https://github.com/bogdal/pager'>here</a>.
+
 
