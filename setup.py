@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
-
+from gcm import VERSION
 
 setup(
     name='django-gcm',
-    version='0.9.0',
+    version=VERSION,
     description='Google Cloud Messaging Server',
     author='Adam Bogdal',
     author_email='adam@bogdal.pl',

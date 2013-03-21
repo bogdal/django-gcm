@@ -16,6 +16,7 @@ class DeviceResource(Resource):
         authentication = Authentication()
         authorization = Authorization()
         serializer = Serializer(formats=['json'])
+        form_class = DeviceForm
 
     def prepend_urls(self):
         return [
@@ -30,30 +31,36 @@ class DeviceResource(Resource):
         self.throttle_check(request)
         self.method_check(request, self._meta.allowed_methods)
 
+    def get_form_class(self, **kwargs):
+        return self._meta.form_class(**kwargs)
+
     def _form_processing(self, request, is_active):
         self._verify(request)
+        self.request = request
 
         kwargs = {
             'data': self.deserialize(request, request.raw_post_data)
         }
+        kwargs['data']['is_active'] = is_active
         try:
             kwargs['instance'] = Device.objects.get(dev_id=kwargs['data'].get('dev_id'))
         except Device.DoesNotExist:
             pass
 
-        form = DeviceForm(**kwargs)
+        form = self.get_form_class(**kwargs)
         self.response_class = HttpResponseBadRequest
 
         if form.is_valid():
-            device = form.save(commit=False)
-            device.is_active = is_active
-            device.save()
+            form.save()
             self.response_class = HttpResponse
+
+    def get_response(self, request):
+        return self.create_response(request, data={}, response_class=self.response_class)
 
     def register(self, request, **kwargs):
         self._form_processing(request, is_active=True)
-        return self.create_response(request, data={}, response_class=self.response_class)
+        return self.get_response(request)
 
     def unregister(self, request, **kwargs):
         self._form_processing(request, is_active=False)
-        return self.create_response(request, data={}, response_class=self.response_class)
+        return self.get_response(request)

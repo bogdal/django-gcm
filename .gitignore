@@ -3,3 +3,7 @@
 *.pyc
 local_settings.py
 database.db
+.idea
+*~
+dist
+*.egg-info
