@@ -34,6 +34,9 @@ class DeviceResource(Resource):
     def get_form_class(self, **kwargs):
         return self._meta.form_class(**kwargs)
 
+    def get_instance(self, **kwargs):
+        return Device.objects.get(dev_id=kwargs['data'].get('dev_id'))
+
     def _form_processing(self, request, is_active):
         self._verify(request)
         self.request = request
@@ -43,7 +46,7 @@ class DeviceResource(Resource):
         }
         kwargs['data']['is_active'] = is_active
         try:
-            kwargs['instance'] = Device.objects.get(dev_id=kwargs['data'].get('dev_id'))
+            kwargs['instance'] = self.get_instance(**kwargs)
         except Device.DoesNotExist:
             pass
 
