@@ -25,6 +25,6 @@ class Device(models.Model):
     def send_message(self, msg):
         return send_gcm_message(
             api_key=settings.GCM_APIKEY,
-            reg_id=self.reg_id,
+            regs_id=[self.reg_id],
             data={'msg': msg},
             collapse_key="message")
