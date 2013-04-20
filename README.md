@@ -1,6 +1,7 @@
 django-gcm
 ==========
 [![Build Status](https://travis-ci.org/bogdal/django-gcm.png?branch=master)](https://travis-ci.org/bogdal/django-gcm)
+[![PyPI](https://version-image.appspot.com/pypi/?name=django-gcm)](https://pypi.python.org/pypi/django-gcm/)
 
 Google Cloud Messaging Server in Django
 
@@ -23,11 +24,11 @@ GCM_APIKEY = "<api_key>"
 Add <code>gcm urls</code> to <code>urls.py</code> file:
 
 ```python
-  urlpatterns = patterns('',
-      ...
-      url(r'', include('gcm.urls')),
-      ...
-  )
+urlpatterns = patterns('',
+  ...
+  url(r'', include('gcm.urls')),
+  ...
+)
 ```
 
 Send messages
