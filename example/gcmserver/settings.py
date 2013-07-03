@@ -145,7 +145,13 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
 
+    # external
+    'tastypie',
     'gcm',
+
+    # This application shows how to easily extend
+    # DeviceResource and add user authentication
+    'gcmserver.app',
 )
 
 # A sample logging configuration. The only tangible logging
