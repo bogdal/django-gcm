@@ -8,6 +8,7 @@ from tastypie.serializers import Serializer
 
 from .forms import DeviceForm
 from .models import get_device_model
+from .signals import device_registered, device_unregistered
 
 
 class DeviceResource(Resource):
@@ -56,7 +57,9 @@ class DeviceResource(Resource):
         self.response_class = HttpResponseBadRequest
 
         if form.is_valid():
-            form.save()
+            device = form.save()
+            signal = device_registered if is_active else device_unregistered
+            signal.send(sender=self, device=device, request=request)
             self.response_class = HttpResponse
 
     def get_response(self, request):
