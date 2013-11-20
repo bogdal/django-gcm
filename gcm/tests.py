@@ -38,6 +38,18 @@ class DeviceResourceTest(ResourceTestCase):
         self.assertEqual(devices.count(), 1)
         self.assertTrue(list(devices).pop().is_active)
 
+    def test_unregister_device(self):
+        device_id = 'TEST001'
+        data = {
+            'dev_id': device_id,
+        }
+        response = self.api_client.post(self.api_unregister_url, data=data)
+        self.assertHttpOK(response)
+
+        devices = Device.objects.filter(dev_id=device_id)
+        self.assertEqual(devices.count(), 1)
+        self.assertFalse(list(devices).pop().is_active)
+
     def test_register_device_without_id(self):
         response = self.api_client.post(self.api_register_url, data={})
         self.assertHttpBadRequest(response)
