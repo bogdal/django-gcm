@@ -1,6 +1,10 @@
 from django.core.urlresolvers import reverse
-from gcm.models import Device
 from tastypie.test import ResourceTestCase
+
+from .models import get_device_model
+
+
+Device = get_device_model()
 
 
 class DeviceResourceTest(ResourceTestCase):

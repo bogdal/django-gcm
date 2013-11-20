@@ -1,11 +1,13 @@
+from django.conf.urls import url
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseBadRequest
 from tastypie.authentication import Authentication
 from tastypie.authorization import Authorization
 from tastypie.resources import Resource
 from tastypie.serializers import Serializer
-from django.conf.urls import url
-from gcm.forms import DeviceForm
-from gcm.models import Device
+
+from .forms import DeviceForm
+from .models import get_device_model
 
 
 class DeviceResource(Resource):
@@ -35,19 +37,19 @@ class DeviceResource(Resource):
         return self._meta.form_class(**kwargs)
 
     def get_instance(self, **kwargs):
-        return Device.objects.get(dev_id=kwargs['data'].get('dev_id'))
+        return get_device_model().objects.get(dev_id=kwargs['data'].get('dev_id'))
 
     def _form_processing(self, request, is_active):
         self._verify(request)
         self.request = request
 
         kwargs = {
-            'data': self.deserialize(request, request.raw_post_data)
+            'data': self.deserialize(request, request.body)
         }
         kwargs['data']['is_active'] = is_active
         try:
             kwargs['instance'] = self.get_instance(**kwargs)
-        except Device.DoesNotExist:
+        except ObjectDoesNotExist:
             pass
 
         form = self.get_form_class(**kwargs)

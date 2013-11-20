@@ -1,6 +1,9 @@
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
-from gcm.models import Device
+
+from gcm.models import get_device_model
+
+Device = get_device_model()
 
 
 class Command(BaseCommand):

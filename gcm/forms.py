@@ -1,8 +1,9 @@
 from django import forms
-from gcm.models import Device
+
+from .models import get_device_model
 
 
 class DeviceForm(forms.ModelForm):
     class Meta:
-        model = Device
+        model = get_device_model()
         fields = ('dev_id', 'reg_id', 'is_active')

@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
-from gcm.models import Device
+
+from .models import get_device_model
 
 
 class DeviceAdmin(admin.ModelAdmin):
@@ -18,4 +19,4 @@ class DeviceAdmin(admin.ModelAdmin):
     send_test_message.short_description = _("Send test message")
 
 
-admin.site.register(Device, DeviceAdmin)
+admin.site.register(get_device_model(), DeviceAdmin)

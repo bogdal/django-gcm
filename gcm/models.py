@@ -2,10 +2,16 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from gcm.api import send_gcm_message
+from . import conf
+from .api import send_gcm_message
+from .utils import load_object
 
 
-class Device(models.Model):
+def get_device_model():
+    return load_object(conf.GCM_DEVICE_MODEL)
+
+
+class AbstractDevice(models.Model):
 
     name = models.CharField(max_length=255, verbose_name=_("Name"), blank=True, null=True)
     dev_id = models.CharField(max_length=50, verbose_name=_("Device ID"), unique=True)
@@ -18,6 +24,7 @@ class Device(models.Model):
         return self.dev_id
 
     class Meta:
+        abstract = True
         verbose_name = _("Device")
         verbose_name_plural = _("Devices")
         ordering = ['-modified_date']
@@ -28,3 +35,7 @@ class Device(models.Model):
             regs_id=[self.reg_id],
             data={'msg': msg},
             collapse_key="message")
+
+
+class Device(AbstractDevice):
+    pass
