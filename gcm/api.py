@@ -1,4 +1,4 @@
-import urllib2
+import requests
 import json
 
 
@@ -26,8 +26,7 @@ def send_gcm_message(api_key, regs_id, data, collapse_key=None):
         'Authorization': 'key=' + api_key,
     }
 
-    request = urllib2.Request("https://android.googleapis.com/gcm/send", data=values, headers=headers)
-    response = urllib2.urlopen(request)
-    result = response.read()
-
-    return result
+    response = requests.post(url="https://android.googleapis.com/gcm/send",
+                             data=values,
+                             headers=headers)
+    return response.content
