@@ -28,6 +28,7 @@ setup(
     install_requires=[
         'django>=1.5',
         'django-tastypie>=0.9.13',
+        'python-mimeparse>=0.1.4',
         'pytz==2013.8',
         'requests>=1.2.0',
     ],
