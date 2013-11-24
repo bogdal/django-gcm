@@ -1,3 +1,5 @@
+import warnings
+
 from django.conf.urls import url
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -6,12 +8,18 @@ from tastypie.authorization import Authorization
 from tastypie.resources import Resource
 from tastypie.serializers import Serializer
 
-from .forms import DeviceForm
+from . import signals
+from .forms import RegisterDeviceForm, UnregisterDeviceForm
 from .models import get_device_model
-from .signals import device_registered, device_unregistered
 
 
 class DeviceResource(Resource):
+
+    DEVICE_ID_FIELD_NAME = 'dev_id'
+
+    model_class = get_device_model()
+    register_form_class = RegisterDeviceForm
+    unregister_form_class = UnregisterDeviceForm
 
     class Meta:
         resource_name = 'device'
@@ -19,14 +27,15 @@ class DeviceResource(Resource):
         authentication = Authentication()
         authorization = Authorization()
         serializer = Serializer(formats=['json'])
-        form_class = DeviceForm
 
     def prepend_urls(self):
         return [
-            url(r"^(?P<resource_name>%s)/register/$" % self._meta.resource_name,
-                self.wrap_view('register'), name="register-device"),
-            url(r"^(?P<resource_name>%s)/unregister/$" % self._meta.resource_name,
-                self.wrap_view('unregister'), name="unregister-device"),
+            url(r"^(?P<resource_name>%s)/register/$" %
+                self._meta.resource_name, self.wrap_view('register'),
+                name="register-device"),
+            url(r"^(?P<resource_name>%s)/unregister/$" %
+                self._meta.resource_name, self.wrap_view('unregister'),
+                name="unregister-device"),
         ]
 
     def _verify(self, request):
@@ -35,40 +44,65 @@ class DeviceResource(Resource):
         self.method_check(request, self._meta.allowed_methods)
 
     def get_form_class(self, **kwargs):
-        return self._meta.form_class(**kwargs)
+        # deprecated
+        return None
 
-    def get_instance(self, **kwargs):
-        return get_device_model().objects.get(dev_id=kwargs['data'].get('dev_id'))
-
-    def _form_processing(self, request, is_active):
-        self._verify(request)
-        self.request = request
-
-        kwargs = {
-            'data': self.deserialize(request, request.body)
-        }
-        kwargs['data']['is_active'] = is_active
+    def get_form_kwargs(self, request):
+        data = self.deserialize(request, request.body)
+        kwargs = {'data': data}
         try:
-            kwargs['instance'] = self.get_instance(**kwargs)
+            kwargs['instance'] = self.get_instance(data)
         except ObjectDoesNotExist:
             pass
+        return kwargs
 
-        form = self.get_form_class(**kwargs)
-        self.response_class = HttpResponseBadRequest
+    def get_form(self, form_class, request):
+        return form_class(**self.get_form_kwargs(request))
+
+    def get_queryset(self):
+        return self.model_class.objects.all()
+
+    def get_instance(self, data):
+        kwargs = {self.DEVICE_ID_FIELD_NAME:
+                  data.get(self.DEVICE_ID_FIELD_NAME)}
+        return self.get_queryset().get(**kwargs)
+
+    def form_valid(self, form):
+        self.object = form.save()
+        return HttpResponse
+
+    def form_invalid(self, form):
+        return HttpResponseBadRequest
+
+    def _form_processing(self, form_class, request):
+        self._verify(request)
+
+        form = self.get_form_class(**self.get_form_kwargs(request))
+        if form:
+            msg = "gcm.resources.get_form_class is deprecated; " \
+                "use gcm.resources.get_form instead"
+            warnings.warn(msg, DeprecationWarning)
+        else:
+            form = self.get_form(form_class, request)
 
         if form.is_valid():
-            device = form.save()
-            signal = device_registered if is_active else device_unregistered
-            signal.send(sender=self, device=device, request=request)
-            self.response_class = HttpResponse
+            response_class = self.form_valid(form)
+        else:
+            response_class = self.form_invalid(form)
 
-    def get_response(self, request):
-        return self.create_response(request, data={}, response_class=self.response_class)
+        return self.create_response(request, data={},
+                                    response_class=response_class)
 
     def register(self, request, **kwargs):
-        self._form_processing(request, is_active=True)
-        return self.get_response(request)
+        form_class = self.register_form_class
+        response = self._form_processing(form_class, request)
+        signals.device_registered.send(sender=self, device=self.object,
+                                       request=request)
+        return response
 
     def unregister(self, request, **kwargs):
-        self._form_processing(request, is_active=False)
-        return self.get_response(request)
+        form_class = self.unregister_form_class
+        response = self._form_processing(form_class, request)
+        signals.device_unregistered.send(sender=self, device=self.object,
+                                         request=request)
+        return response
