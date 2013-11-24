@@ -1,13 +1,16 @@
 from tastypie.authentication import ApiKeyAuthentication
 from gcm.resources import DeviceResource
 
-from .forms import DeviceForm
-
 
 class CustomResource(DeviceResource):
 
     class Meta(DeviceResource.Meta):
         authentication = ApiKeyAuthentication()
 
-    def get_form_class(self, **kwargs):
-        return DeviceForm(self.request.user, **kwargs)
+    def get_queryset(self):
+        qs = super(CustomResource, self).get_queryset()
+        return qs.filter(user=self.request.user)
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super(CustomResource, self).form_invalid(form)

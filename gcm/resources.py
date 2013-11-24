@@ -20,6 +20,8 @@ class DeviceResource(Resource):
     model_class = get_device_model()
     register_form_class = RegisterDeviceForm
     unregister_form_class = UnregisterDeviceForm
+    object = None
+    request = None
 
     class Meta:
         resource_name = 'device'
@@ -47,8 +49,8 @@ class DeviceResource(Resource):
         # deprecated
         return None
 
-    def get_form_kwargs(self, request):
-        data = self.deserialize(request, request.body)
+    def get_form_kwargs(self):
+        data = self.deserialize(self.request, self.request.body)
         kwargs = {'data': data}
         try:
             kwargs['instance'] = self.get_instance(data)
@@ -56,8 +58,8 @@ class DeviceResource(Resource):
             pass
         return kwargs
 
-    def get_form(self, form_class, request):
-        return form_class(**self.get_form_kwargs(request))
+    def get_form(self, form_class):
+        return form_class(**self.get_form_kwargs())
 
     def get_queryset(self):
         return self.model_class.objects.all()
@@ -76,14 +78,15 @@ class DeviceResource(Resource):
 
     def _form_processing(self, form_class, request):
         self._verify(request)
+        self.request = request
 
-        form = self.get_form_class(**self.get_form_kwargs(request))
+        form = self.get_form_class(**self.get_form_kwargs())
         if form:
             msg = "gcm.resources.get_form_class is deprecated; " \
                 "use gcm.resources.get_form instead"
             warnings.warn(msg, DeprecationWarning)
         else:
-            form = self.get_form(form_class, request)
+            form = self.get_form(form_class)
 
         if form.is_valid():
             response_class = self.form_valid(form)

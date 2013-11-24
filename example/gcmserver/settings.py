@@ -187,6 +187,9 @@ LOGGING = {
 # ApiKey - https://code.google.com/apis/console (Key for server apps)
 GCM_APIKEY = "<api_key>"
 
+# extending device model
+#GCM_DEVICE_MODEL = 'gcmserver.app.models.UserDevice'
+
 try:
     execfile(os.path.join(PROJECT_PATH, 'local_settings.py'))
 except IOError:
