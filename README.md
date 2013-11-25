@@ -31,22 +31,8 @@ urlpatterns = patterns('',
 )
 ```
 
-Send messages
------
-You can simply use the console:
-```
-$ python manage.py gcm_messenger --devices
-Devices list:
-(#1) My phone
-$ python manage.py gcm_messenger 1 'my test message'
-[OK] device #1 (My phone): id=xxxxx
-```
-or use python for that:
-```python
-from gcm.models import Device
-my_phone = Device.objects.get(name='My phone')
-my_phone.send_message('my test message')
-```
+Documentation: <a href='https://django-gcm.readthedocs.org'>https://django-gcm.readthedocs.org</a>
+
 
 Client
 ------
