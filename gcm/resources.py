@@ -1,5 +1,3 @@
-import warnings
-
 from django.conf.urls import url
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -45,10 +43,6 @@ class DeviceResource(Resource):
         self.throttle_check(request)
         self.method_check(request, self._meta.allowed_methods)
 
-    def get_form_class(self, **kwargs):
-        # deprecated
-        return None
-
     def get_form_kwargs(self):
         data = self.deserialize(self.request, self.request.body)
         kwargs = {'data': data}
@@ -80,13 +74,7 @@ class DeviceResource(Resource):
         self._verify(request)
         self.request = request
 
-        form = self.get_form_class(**self.get_form_kwargs())
-        if form:
-            msg = "gcm.resources.get_form_class is deprecated; " \
-                "use gcm.resources.get_form instead"
-            warnings.warn(msg, DeprecationWarning)
-        else:
-            form = self.get_form(form_class)
+        form = self.get_form(form_class)
 
         if form.is_valid():
             response_class = self.form_valid(form)
