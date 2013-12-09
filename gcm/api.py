@@ -29,4 +29,5 @@ def send_gcm_message(api_key, regs_id, data, collapse_key=None):
     response = requests.post(url="https://android.googleapis.com/gcm/send",
                              data=values,
                              headers=headers)
-    return response.content
+
+    return json.loads(response.content)
