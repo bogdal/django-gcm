@@ -16,7 +16,13 @@ class Command(BaseCommand):
             action='store_true',
             dest='devices',
             default=False,
-            help='List of available devices'),)
+            help='List of available devices'),
+        make_option(
+            '--collapse-key',
+            dest='collapse_key',
+            default='message',
+            help='Set value of collapse_key flag, default is "message"'),
+        )
 
     def handle(self, *args, **options):
 
@@ -28,7 +34,7 @@ class Command(BaseCommand):
                 self.stdout.write("(#%s) %s\n" % (device.id, device.name))
             self.stdout.write("\n")
         else:
-
+            collapse_key = options['collapse_key']
             try:
                 id = args[0]
                 message = args[1]
@@ -41,6 +47,6 @@ class Command(BaseCommand):
             except Device.DoesNotExist:
                 raise CommandError('Unknown device (id=%s). Check list: python manage.py messenger --devices' % id)
             else:
-                result = device.send_message(message)
+                result = device.send_message(message, collapse_key=collapse_key)
 
                 self.stdout.write("[OK] device #%s (%s): %s\n" % (id, device.name, result))
