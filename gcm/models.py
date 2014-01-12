@@ -29,12 +29,12 @@ class AbstractDevice(models.Model):
         verbose_name_plural = _("Devices")
         ordering = ['-modified_date']
 
-    def send_message(self, msg):
+    def send_message(self, msg, collapse_key="message"):
         return send_gcm_message(
             api_key=settings.GCM_APIKEY,
             regs_id=[self.reg_id],
             data={'msg': msg},
-            collapse_key="message")
+            collapse_key=collapse_key)
 
 
 class Device(AbstractDevice):
