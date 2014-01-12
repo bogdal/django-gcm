@@ -5,6 +5,7 @@ setup(
     name='django-gcm',
     version=VERSION,
     description='Google Cloud Messaging Server',
+    long_description=open('README.rst').read(),
     author='Adam Bogdal',
     author_email='adam@bogdal.pl',
     url='https://github.com/bogdal/django-gcm',

@@ -13,7 +13,7 @@ Signals
 
    ``device``
         An instance of ``gcm.models.Device`` (see :ref:`extending_device`)
-        representing the registered device.
+        represents the registered device.
 
    ``request``
        The ``HttpRequest`` in which the device was registered.
@@ -27,7 +27,7 @@ Signals
 
    ``device``
         An instance of ``gcm.models.Device`` (see :ref:`extending_device`)
-        representing the unregistered device.
+        represents the unregistered device.
 
    ``request``
        The ``HttpRequest`` in which the device was unregistered.
