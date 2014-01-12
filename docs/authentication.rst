@@ -1,7 +1,7 @@
 Api key authentication
 ======================
 
-Allows you to manage access to the GCM api using one of the available ``tastypie`` authentication method - `ApiKeyAuthentication`.
+Allows you to manage access to the GCM api using one of the available ``tastypie`` authentication methods - `ApiKeyAuthentication`.
 
 .. _django-tastypie Authentication: http://django-tastypie.readthedocs.org/en/latest/authentication.html
 
@@ -89,7 +89,7 @@ You need to hook your resource class up in your ``urls.py`` file:
     )
 
 
-Include your ``urls.py`` file to the main URL router:
+Include your ``urls.py`` file in the main URL router:
 
 .. code-block:: python
 
