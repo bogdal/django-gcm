@@ -10,7 +10,7 @@ You can simply use the console:
     > Devices list:
     > (#1) My phone
 
-    # python manage.py gcm_messagner <device_id> <message> [--collapse-key <key>]
+    # python manage.py gcm_messenger <device_id> <message> [--collapse-key <key>]
     $ python manage.py gcm_messenger 1 'my test message'
 
 or django orm for that::
