@@ -1,0 +1,22 @@
+{% extends "admin/change_form.html" %}
+{% load i18n static %}
+
+{% block breadcrumbs %}
+        {% with app_label=opts.app_label original=_('Send message') has_change_permission=1 %}
+            {{ block.super }}
+        {% endwith %}
+{% endblock %}
+
+{% block field_sets %}
+    <h2>{% trans "Send message" %}</h2>
+    <fieldset class="module aligned wide">
+	    {{ form }}
+    </fieldset>
+{% endblock field_sets %}
+
+{% block inline_field_sets %}{% endblock inline_field_sets %}
+
+
+{% block submit_buttons_bottom %}
+	<input type="submit" value="{% trans 'Send' %}" class="default" name="_save" />
+{% endblock %}
