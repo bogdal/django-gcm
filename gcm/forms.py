@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import ugettext_lazy as _
 
 from .models import get_device_model
 
@@ -23,3 +24,8 @@ class UnregisterDeviceForm(forms.ModelForm):
     def save(self, commit=True):
         self.instance.is_active = False
         return super(UnregisterDeviceForm, self).save(commit)
+
+
+class MessageForm(forms.Form):
+
+    message = forms.CharField(label=_('Message'), required=True)
