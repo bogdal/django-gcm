@@ -20,7 +20,7 @@ def get_api_key():
 class AbstractDevice(models.Model):
 
     dev_id = models.CharField(max_length=50, verbose_name=_("Device ID"), unique=True)
-    reg_id = models.TextField(verbose_name=_("Registration ID"), unique=True)
+    reg_id = models.CharField(max_length=255, verbose_name=_("Registration ID"), unique=True)
     name = models.CharField(max_length=255, verbose_name=_("Name"), blank=True, null=True)
     creation_date = models.DateTimeField(verbose_name=_("Creation date"), auto_now_add=True)
     modified_date = models.DateTimeField(verbose_name=_("Modified date"), auto_now=True)
