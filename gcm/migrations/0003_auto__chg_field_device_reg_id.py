@@ -11,17 +11,9 @@ class Migration(SchemaMigration):
 
         # Changing field 'Device.reg_id'
         db.alter_column(u'gcm_device', 'reg_id', self.gf('django.db.models.fields.CharField')(unique=True, max_length=255))
-        # Adding unique constraint on 'Device', fields ['reg_id']
-        db.create_unique(u'gcm_device', ['reg_id'])
-
 
     def backwards(self, orm):
-        # Removing unique constraint on 'Device', fields ['reg_id']
-        db.delete_unique(u'gcm_device', ['reg_id'])
-
-
-        # Changing field 'Device.reg_id'
-        db.alter_column(u'gcm_device', 'reg_id', self.gf('django.db.models.fields.TextField')(null=True))
+        pass
 
     models = {
         u'gcm.device': {
