@@ -22,7 +22,7 @@ class UnregisterDeviceForm(forms.ModelForm):
         fields = ('dev_id',)
 
     def save(self, commit=True):
-        self.instance.is_active = False
+        self.instance.mark_inactive()
         return super(UnregisterDeviceForm, self).save(commit)
 
 
