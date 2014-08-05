@@ -36,10 +36,15 @@ class AbstractDevice(models.Model):
         ordering = ['-modified_date']
 
     def send_message(self, msg, collapse_key="message"):
+        if isinstance(msg, dict):
+            data = msg
+        else:
+            data = {'msg': msg}
+
         return send_gcm_message(
             api_key=get_api_key(),
             regs_id=[self.reg_id],
-            data={'msg': msg},
+            data=data,
             collapse_key=collapse_key)
 
 
