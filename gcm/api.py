@@ -1,7 +1,7 @@
 import requests
 import json
 
-MAX_RECIPIENTS = 1000
+from . import conf
 
 
 def _chunks(items, limit):
@@ -23,9 +23,12 @@ def send_gcm_message(api_key, regs_id, data, collapse_key=None):
         http://developer.android.com/google/gcm/gcm.html#request
     """
 
-    if len(regs_id) > MAX_RECIPIENTS:
+    if not isinstance(data, dict):
+        data = {'msg': data}
+
+    if len(regs_id) > conf.GCM_MAX_RECIPIENTS:
         ret = []
-        for chunk in _chunks(regs_id, MAX_RECIPIENTS):
+        for chunk in _chunks(regs_id, conf.GCM_MAX_RECIPIENTS):
             ret.append(send_gcm_message(api_key, chunk, data, collapse_key))
         return ret
 

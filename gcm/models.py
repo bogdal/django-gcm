@@ -56,12 +56,7 @@ class AbstractDevice(models.Model):
         verbose_name_plural = _("Devices")
         ordering = ['-modified_date']
 
-    def send_message(self, msg, collapse_key="message"):
-        if isinstance(msg, dict):
-            data = msg
-        else:
-            data = {'msg': msg}
-
+    def send_message(self, data, collapse_key="message"):
         return send_gcm_message(
             api_key=get_api_key(),
             regs_id=[self.reg_id],
