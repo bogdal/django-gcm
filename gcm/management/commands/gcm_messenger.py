@@ -40,12 +40,12 @@ class Command(BaseCommand):
                 message = args[1]
             except IndexError:
                 raise CommandError(
-                    "Invalid params. You have to put all params: python manage.py messanger <device_id> <msg>")
+                    "Invalid params. You have to put all params: python manage.py gcm_messenger <device_id> <msg>")
 
             try:
                 device = Device.objects.get(pk=int(id), is_active=True)
             except Device.DoesNotExist:
-                raise CommandError('Unknown device (id=%s). Check list: python manage.py messenger --devices' % id)
+                raise CommandError('Unknown device (id=%s). Check list: python manage.py gcm_messenger --devices' % id)
             else:
                 result = device.send_message(message, collapse_key=collapse_key)
 
