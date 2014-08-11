@@ -1,10 +1,9 @@
-from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
 
 from . import conf
-from .api import send_gcm_message
+from .api import GCMMessage
 from .utils import load_object
 
 
@@ -12,18 +11,11 @@ def get_device_model():
     return load_object(conf.GCM_DEVICE_MODEL)
 
 
-def get_api_key():
-    if not conf.GCM_APIKEY:
-        raise ImproperlyConfigured("You haven't set the 'GCM_APIKEY' setting yet.")
-    return conf.GCM_APIKEY
-
-
 class DeviceQuerySet(QuerySet):
 
     def send_message(self, data, collapse_key="message"):
         if self:
-            return send_gcm_message(
-                api_key=get_api_key(),
+            return GCMMessage().send(
                 regs_id=list(self.values_list("reg_id", flat=True)),
                 data=data,
                 collapse_key=collapse_key)
@@ -57,8 +49,7 @@ class AbstractDevice(models.Model):
         ordering = ['-modified_date']
 
     def send_message(self, data, collapse_key="message"):
-        return send_gcm_message(
-            api_key=get_api_key(),
+        return GCMMessage().send(
             regs_id=[self.reg_id],
             data=data,
             collapse_key=collapse_key)
