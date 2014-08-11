@@ -36,12 +36,31 @@ class AbstractDevice(models.Model):
         ordering = ['-modified_date']
 
     def send_message(self, msg, collapse_key="message"):
+        if isinstance(msg, dict):
+            data = msg
+        else:
+            data = {'msg': msg}
+
         return send_gcm_message(
             api_key=get_api_key(),
             regs_id=[self.reg_id],
-            data={'msg': msg},
+            data=data,
             collapse_key=collapse_key)
+
+    def get_queryset(self):
+        return DeviceQuerySet(self.model)
+    get_query_set = get_queryset  # Django < 1.6 compatiblity
 
 
 class Device(AbstractDevice):
     pass
+
+
+class DeviceQuerySet(models.query.QuerySet):
+    def send_message(self, data, collapse_key="message"):
+        if self:
+                return send_gcm_message(
+                    api_key=get_api_key(),
+                    regs_id=list(self.values_list("reg_id", flat=True)),
+                    data=data,
+                    collapse_key=collapse_key)

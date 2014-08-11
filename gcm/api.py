@@ -1,6 +1,16 @@
 import requests
 import json
 
+MAX_RECIPIENTS = 1000
+
+
+def _chunks(items, limit):
+    """
+    Yield successive chunks from list \a items with a minimum size \a limit
+    """
+    for i in range(0, len(items), limit):
+        yield items[i:i + limit]
+
 
 def send_gcm_message(api_key, regs_id, data, collapse_key=None):
     """
@@ -12,6 +22,13 @@ def send_gcm_message(api_key, regs_id, data, collapse_key=None):
     collapse_key: A string to group messages, look at the documentation about it:
         http://developer.android.com/google/gcm/gcm.html#request
     """
+
+    if len(regs_id) > MAX_RECIPIENTS:
+        ret = []
+        for chunk in _chunks(regs_id, MAX_RECIPIENTS):
+            ret.append(send_gcm_message(api_key, chunk, data, collapse_key))
+        return ret
+
     values = {
         'registration_ids': regs_id,
         'collapse_key': collapse_key,
