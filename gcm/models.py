@@ -3,7 +3,7 @@ from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
 
 from . import conf
-from .api import GCMMessage
+from . import api
 from .utils import load_object
 
 
@@ -26,6 +26,36 @@ class DeviceManager(models.Manager):
     def get_queryset(self):
         return DeviceQuerySet(self.model)
     get_query_set = get_queryset  # Django < 1.6 compatiblity
+
+
+class GCMMessage(api.GCMMessage):
+    GCM_INVALID_ID_ERRORS = ['InvalidRegistration',
+                             'NotRegistered',
+                             'MismatchSenderId']
+
+    def send(self, regs_id, data, collapse_key=None):
+        responses = super(GCMMessage, self).send(regs_id, data, collapse_key)
+        self.post_send(regs_id, responses)
+        return responses
+
+    def post_send(self, regs_id, response):
+        if response["failure"] == 0:
+            return
+
+        Device = get_device_model()
+
+        results = response["results"]
+        error_regs_id = []
+        error_msgs = []
+        for reg_id, res in zip(regs_id, results):
+            if res.get("error", None) in GCMMessage.GCM_INVALID_ID_ERRORS:
+                error_regs_id.append(reg_id)
+                error_msgs.append(res.get("error"))
+
+        if error_regs_id:
+            error_devs = Device.objects.filter(reg_id__in=error_regs_id)
+            for error_dev, error_msg in zip(error_devs, error_msgs):
+                error_dev.mark_inactive(error=error_msg)
 
 
 class AbstractDevice(models.Model):
@@ -53,6 +83,10 @@ class AbstractDevice(models.Model):
             regs_id=[self.reg_id],
             data=data,
             collapse_key=collapse_key)
+
+    def mark_inactive(self, error=None):
+        self.is_active = False
+        self.save()
 
 
 class Device(AbstractDevice):
