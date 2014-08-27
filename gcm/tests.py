@@ -1,8 +1,10 @@
 from django.core.urlresolvers import reverse
+from django.test import TestCase
 from tastypie.test import ResourceTestCase
+from mock import patch
 
 from .models import get_device_model
-
+from .api import GCMMessage as ApiGCMMessage
 
 Device = get_device_model()
 
@@ -68,3 +70,35 @@ class DeviceResourceTest(ResourceTestCase):
 
         reg_id = Device.objects.get(pk=device.pk).reg_id
         self.assertEqual(reg_id, expected_registration_id)
+
+
+class GCMMessageTest(TestCase):
+
+    @patch.object(ApiGCMMessage, 'send')
+    def test_mark_inactive(self, mock_send):
+        Device.objects.create(dev_id='device_1', reg_id='000123abc001', is_active=True)
+        Device.objects.create(dev_id='device_2', reg_id='000123abc002', is_active=True)
+        Device.objects.create(dev_id='device_3', reg_id='000123abc003', is_active=True)
+
+        mock_send.return_value = {u'failure': 2, u'canonical_ids': 0, u'success': 1, u'multicast_id': 112233,
+                                  u'results': [
+                                      {u'error': u'InvalidRegistration'},
+                                      {u'message_id': u'0:123123'},
+                                      {u'error': u'NotRegistered'}]}
+
+        Device.objects.all().send_message('test message')
+
+        devices = Device.objects.filter(is_active=False, dev_id__in=['device_1', 'device_3'])
+        self.assertEqual(devices.count(), 2)
+
+    @patch.object(ApiGCMMessage, 'send')
+    def test_ignore_unhandled_error(self, mock_send):
+        Device.objects.create(dev_id='device_1', reg_id='000123abc001', is_active=True)
+
+        mock_send.return_value = {u'failure': 1, u'canonical_ids': 0, u'success': 0, u'multicast_id': 112233,
+                                  u'results': [{u'error': u'UnhandledError'}]}
+
+        Device.objects.all().send_message('test message')
+
+        device = Device.objects.get(dev_id='device_1')
+        self.assertTrue(device.is_active)
