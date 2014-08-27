@@ -11,6 +11,25 @@ def get_device_model():
     return load_object(conf.GCM_DEVICE_MODEL)
 
 
+class GCMMessage(api.GCMMessage):
+    GCM_INVALID_ID_ERRORS = [u'InvalidRegistration',
+                             u'NotRegistered',
+                             u'MismatchSenderId']
+
+    def send(self, regs_id, data, collapse_key=None):
+        response = super(GCMMessage, self).send(regs_id, data, collapse_key)
+        self.post_send(regs_id, response)
+        return response
+
+    def post_send(self, regs_id, response):
+        if response['failure']:
+            invalid_messages = dict(filter(lambda x: x[1].get('error') in self.GCM_INVALID_ID_ERRORS,
+                                           zip(regs_id, response.get('results'))))
+
+            for device in get_device_model().objects.filter(reg_id__in=invalid_messages.keys()):
+                device.mark_inactive(error_message=invalid_messages[device.reg_id]['error'])
+
+
 class DeviceQuerySet(QuerySet):
 
     def send_message(self, data, collapse_key="message"):
@@ -26,36 +45,6 @@ class DeviceManager(models.Manager):
     def get_queryset(self):
         return DeviceQuerySet(self.model)
     get_query_set = get_queryset  # Django < 1.6 compatiblity
-
-
-class GCMMessage(api.GCMMessage):
-    GCM_INVALID_ID_ERRORS = ['InvalidRegistration',
-                             'NotRegistered',
-                             'MismatchSenderId']
-
-    def send(self, regs_id, data, collapse_key=None):
-        responses = super(GCMMessage, self).send(regs_id, data, collapse_key)
-        self.post_send(regs_id, responses)
-        return responses
-
-    def post_send(self, regs_id, response):
-        if response["failure"] == 0:
-            return
-
-        Device = get_device_model()
-
-        results = response["results"]
-        error_regs_id = []
-        error_msgs = []
-        for reg_id, res in zip(regs_id, results):
-            if res.get("error", None) in GCMMessage.GCM_INVALID_ID_ERRORS:
-                error_regs_id.append(reg_id)
-                error_msgs.append(res.get("error"))
-
-        if error_regs_id:
-            error_devs = Device.objects.filter(reg_id__in=error_regs_id)
-            for error_dev, error_msg in zip(error_devs, error_msgs):
-                error_dev.mark_inactive(error=error_msg)
 
 
 class AbstractDevice(models.Model):
@@ -84,7 +73,7 @@ class AbstractDevice(models.Model):
             data=data,
             collapse_key=collapse_key)
 
-    def mark_inactive(self, error=None):
+    def mark_inactive(self, **kwargs):
         self.is_active = False
         self.save()
 
