@@ -59,4 +59,4 @@ class GCMMessage(object):
                                  data=values,
                                  headers=headers)
         response.raise_for_status()
-        return json.loads(response.content)
+        return (regs_id, json.loads(response.content))

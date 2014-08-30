@@ -18,7 +18,9 @@ class GCMMessage(api.GCMMessage):
 
     def send(self, regs_id, data, collapse_key=None):
         response = super(GCMMessage, self).send(regs_id, data, collapse_key)
-        self.post_send(regs_id, response)
+        chunks = [response] if not isinstance(response, list) else response
+        for chunk in chunks:
+            self.post_send(*chunk)
         return response
 
     def post_send(self, regs_id, response):
