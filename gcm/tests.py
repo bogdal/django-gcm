@@ -94,7 +94,7 @@ class GCMMessageTest(TestCase):
         Device.objects.all().send_message('test message')
 
         devices = Device.objects.filter(is_active=False)
-        self.assertEqual(set(devices.values_list('dev_id', flat=True)), {u'device_1', u'device_3'})
+        self.assertEqual(devices.count(), 2)
 
     @patch.object(ApiGCMMessage, 'send')
     def test_ignore_unhandled_error(self, mock_send):
@@ -137,4 +137,4 @@ class GCMMessageTest(TestCase):
             Device.objects.all().send_message('test message')
 
         devices = Device.objects.filter(is_active=False)
-        self.assertEqual(set(devices.values_list('dev_id', flat=True)), {u'device_1', u'device_4', u'device_5'})
+        self.assertEqual(devices.count(), 3)
