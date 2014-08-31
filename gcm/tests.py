@@ -1,5 +1,7 @@
 import json
+from StringIO import StringIO
 
+from django.core import management
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from tastypie.test import ResourceTestCase
@@ -11,6 +13,15 @@ from .models import get_device_model
 from .api import GCMMessage as ApiGCMMessage
 
 Device = get_device_model()
+
+
+class CommandTest(TestCase):
+
+    def test_gcm_urls(self):
+        out = StringIO()
+        management.call_command('gcm_urls', stdout=out)
+        self.assertIn(u'/gcm/v1/device/register', out.getvalue())
+        self.assertIn(u'/gcm/v1/device/unregister', out.getvalue())
 
 
 class DeviceResourceTest(ResourceTestCase):
