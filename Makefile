@@ -1,4 +1,9 @@
 install:
-	python setup.py develop --upgrade
+	pip install -e .[dev] --upgrade
+
 test:
-	cd example/basic_project && python manage.py test gcm
+	python example/basic_project/manage.py test gcm
+
+coverage:
+	coverage erase
+	coverage run example/basic_project/manage.py test gcm

@@ -32,6 +32,11 @@ setup(
         'python-mimeparse>=0.1.4',
         'pytz==2013.8',
         'requests>=1.2.0',
-        'mock==1.0.1',
     ],
+    extras_require={
+        'dev': [
+            'mock>=1.0.1',
+            'coverage'
+        ]
+    }
 )
