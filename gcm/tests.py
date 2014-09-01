@@ -2,6 +2,8 @@ import json
 from StringIO import StringIO
 
 from django.core import management
+from django.core.exceptions import ImproperlyConfigured
+from django.core.management import CommandError
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from tastypie.test import ResourceTestCase
@@ -22,6 +24,25 @@ class CommandTest(TestCase):
         management.call_command('gcm_urls', stdout=out)
         self.assertIn(u'/gcm/v1/device/register', out.getvalue())
         self.assertIn(u'/gcm/v1/device/unregister', out.getvalue())
+
+    @patch.object(ApiGCMMessage, 'send')
+    def test_send_message(self, mock_send):
+        device_name = 'My test device'
+        Device.objects.create(dev_id='device_1', name=device_name, reg_id='000123abc001', is_active=True)
+
+        mock_send.return_value = (Device.objects.values_list('reg_id', flat=True),
+                                  {u'failure': 0, u'canonical_ids': 0, u'success': 1, u'multicast_id': 112233,
+                                   u'results': [{u'message_id': u'0:123123'}]})
+
+        management.call_command('gcm_messenger', '1', 'test')
+        self.assertTrue(mock_send.called)
+
+        out = StringIO()
+        management.call_command('gcm_messenger', devices=True, stdout=out)
+        self.assertIn(device_name, out.getvalue())
+
+        self.assertRaises(CommandError, management.call_command, 'gcm_messenger')
+        self.assertRaises(CommandError, management.call_command, 'gcm_messenger', '999', 'test')
 
 
 class DeviceResourceTest(ResourceTestCase):
@@ -120,6 +141,23 @@ class GCMMessageTest(TestCase):
         device = Device.objects.get(dev_id='device_1')
         self.assertTrue(device.is_active)
 
+    @patch.object(ApiGCMMessage, 'send')
+    def test_ignore_active_device(self, mock_send):
+        dev_id = u'device_1'
+        device = Device.objects.create(dev_id=dev_id, reg_id='000123abc001', is_active=True)
+
+        mock_send.return_value = (Device.objects.values_list('reg_id', flat=True),
+                                  {u'failure': 0, u'canonical_ids': 0, u'success': 1, u'multicast_id': 112233,
+                                   u'results': [{u'message_id': u'0:123123'}]})
+
+        device.send_message('test message')
+        self.assertEqual(Device.objects.get(is_active=True).__unicode__(), dev_id)
+
+    @patch.object(ApiGCMMessage, 'send')
+    def test_ignore_empty_queryset(self, mock_send):
+        Device.objects.all().send_message('test')
+        self.assertFalse(mock_send.called)
+
     @patch.object(conf, 'GCM_MAX_RECIPIENTS', new_callable=PropertyMock(return_value=2))
     def test_split_to_chunks(self, mock_max_recipients):
 
@@ -149,3 +187,8 @@ class GCMMessageTest(TestCase):
 
         devices = Device.objects.filter(is_active=False)
         self.assertEqual(devices.count(), 3)
+
+    @patch.object(conf, 'GCM_APIKEY', new_callable=PropertyMock(return_value=None))
+    def test_configuration(self, mock_apikey):
+        device = Device.objects.create(dev_id='device_1', reg_id='000123abc001', is_active=True)
+        self.assertRaises(ImproperlyConfigured, device.send_message, data='test')
