@@ -1,6 +1,7 @@
 import json
 from StringIO import StringIO
 
+from django.contrib.auth import get_user_model
 from django.core import management
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import CommandError
@@ -15,6 +16,7 @@ from .models import get_device_model
 from .api import GCMMessage as ApiGCMMessage
 
 Device = get_device_model()
+User = get_user_model()
 
 
 class CommandTest(TestCase):
@@ -28,21 +30,55 @@ class CommandTest(TestCase):
     @patch.object(ApiGCMMessage, 'send')
     def test_send_message(self, mock_send):
         device_name = 'My test device'
-        Device.objects.create(dev_id='device_1', name=device_name, reg_id='000123abc001', is_active=True)
+        device = Device.objects.create(dev_id='device_1', name=device_name, reg_id='000123abc001', is_active=True)
 
         mock_send.return_value = (Device.objects.values_list('reg_id', flat=True),
                                   {u'failure': 0, u'canonical_ids': 0, u'success': 1, u'multicast_id': 112233,
                                    u'results': [{u'message_id': u'0:123123'}]})
-
-        management.call_command('gcm_messenger', '1', 'test')
+        out = StringIO()
+        management.call_command('gcm_messenger', device.id, 'test', stdout=out)
         self.assertTrue(mock_send.called)
 
-        out = StringIO()
         management.call_command('gcm_messenger', devices=True, stdout=out)
         self.assertIn(device_name, out.getvalue())
 
         self.assertRaises(CommandError, management.call_command, 'gcm_messenger')
         self.assertRaises(CommandError, management.call_command, 'gcm_messenger', '999', 'test')
+
+
+class AdminTest(TestCase):
+
+    def setUp(self):
+        user_password = 'password'
+        user = User.objects.create_superuser('admin', 'admin@test.com', user_password)
+        self.client.login(username=user.username, password=user_password)
+
+    @patch.object(ApiGCMMessage, 'send')
+    def test_send_message(self, mock_send):
+        device = Device.objects.create(dev_id='device_1', reg_id='000123abc001', is_active=True)
+
+        mock_send.return_value = (Device.objects.values_list('reg_id', flat=True),
+                                  {u'failure': 0, u'canonical_ids': 0, u'success': 1, u'multicast_id': 112233,
+                                   u'results': [{u'message_id': u'0:123123'}]})
+
+        self.client.post('/admin/gcm/device/', data={'action': 'send_message_action',
+                                                     '_selected_action': device.id})
+        response = self.client.post('/admin/gcm/device/send-message/', data={'message': 'admin test message'})
+
+        self.assertTrue(mock_send.called)
+        self.assertEqual(response.status_code, 302)
+
+    def test_do_not_send_empty_message(self):
+        device = Device.objects.create(dev_id='device_1', reg_id='000123abc001', is_active=True)
+
+        self.client.post('/admin/gcm/device/', data={'action': 'send_message_action',
+                                                     '_selected_action': device.id})
+        response = self.client.post('/admin/gcm/device/send-message/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_send_message_view_requires_devices(self):
+        response = self.client.get('/admin/gcm/device/send-message/')
+        self.assertRedirects(response, '/admin/gcm/device/')
 
 
 class DeviceResourceTest(ResourceTestCase):
