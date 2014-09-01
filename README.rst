@@ -3,6 +3,9 @@ django-gcm
 
 .. image:: https://travis-ci.org/bogdal/django-gcm.png?branch=master
     :target: https://travis-ci.org/bogdal/django-gcm
+
+.. image:: https://coveralls.io/repos/bogdal/django-gcm/badge.png?branch=master
+    :target: https://coveralls.io/r/bogdal/django-gcm?branch=master
     
 .. image:: https://version-image.appspot.com/pypi/?name=django-gcm
     :target: https://pypi.python.org/pypi/django-gcm/
