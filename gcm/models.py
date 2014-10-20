@@ -26,11 +26,14 @@ class GCMMessage(api.GCMMessage):
 
     def post_send(self, regs_id, response):
         if response['failure']:
-            invalid_messages = dict(filter(lambda x: x[1].get('error') in self.GCM_INVALID_ID_ERRORS,
-                                           zip(regs_id, response.get('results'))))
+            invalid_messages = dict(filter(
+                lambda x: x[1].get('error') in self.GCM_INVALID_ID_ERRORS,
+                zip(regs_id, response.get('results'))))
 
-            for device in get_device_model().objects.filter(reg_id__in=list(invalid_messages.keys())):
-                device.mark_inactive(error_message=invalid_messages[device.reg_id]['error'])
+            regs = list(invalid_messages.keys())
+            for device in get_device_model().objects.filter(reg_id__in=regs):
+                device.mark_inactive(
+                    error_message=invalid_messages[device.reg_id]['error'])
 
 
 class DeviceQuerySet(QuerySet):
@@ -53,12 +56,18 @@ class DeviceManager(models.Manager):
 @python_2_unicode_compatible
 class AbstractDevice(models.Model):
 
-    dev_id = models.CharField(max_length=50, verbose_name=_("Device ID"), unique=True)
-    reg_id = models.CharField(max_length=255, verbose_name=_("Registration ID"), unique=True)
-    name = models.CharField(max_length=255, verbose_name=_("Name"), blank=True, null=True)
-    creation_date = models.DateTimeField(verbose_name=_("Creation date"), auto_now_add=True)
-    modified_date = models.DateTimeField(verbose_name=_("Modified date"), auto_now=True)
-    is_active = models.BooleanField(verbose_name=_("Is active?"), default=False)
+    dev_id = models.CharField(
+        verbose_name=_("Device ID"), max_length=50, unique=True,)
+    reg_id = models.CharField(
+        verbose_name=_("Registration ID"), max_length=255, unique=True)
+    name = models.CharField(
+        verbose_name=_("Name"), max_length=255, blank=True, null=True)
+    creation_date = models.DateTimeField(
+        verbose_name=_("Creation date"), auto_now_add=True)
+    modified_date = models.DateTimeField(
+        verbose_name=_("Modified date"), auto_now=True)
+    is_active = models.BooleanField(
+        verbose_name=_("Is active?"), default=False)
 
     objects = DeviceManager()
 

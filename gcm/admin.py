@@ -26,13 +26,17 @@ class DeviceAdmin(admin.ModelAdmin):
                 return self.admin_site.admin_view(view)(*args, **kwargs)
             return update_wrapper(wrapper, view)
 
-        urlpatterns = patterns('',
-            url(r'^send-message/$', wrap(self.send_message_view), name=self.build_admin_url('send_message')),
+        urlpatterns = patterns(
+            '',
+            url(r'^send-message/$', wrap(self.send_message_view),
+                name=self.build_admin_url('send_message')),
         )
         return urlpatterns + super(DeviceAdmin, self).get_urls()
 
     def build_admin_url(self, url_name):
-        return '%s_%s_%s' % (self.model._meta.app_label, self.model._meta.module_name, url_name)
+        return '%s_%s_%s' % (self.model._meta.app_label,
+                             self.model._meta.module_name,
+                             url_name)
 
     def send_message_view(self, request):
         base_view = 'admin:%s' % self.build_admin_url('changelist')
@@ -51,10 +55,12 @@ class DeviceAdmin(admin.ModelAdmin):
             return redirect(base_view)
 
         context = {'form': form, 'opts': self.model._meta, 'add': False}
-        return render_to_response('gcm/admin/send_message.html', context, context_instance=RequestContext(request))
+        return render_to_response('gcm/admin/send_message.html', context,
+                                  context_instance=RequestContext(request))
 
     def send_message_action(self, request, queryset):
-        request.session['device_ids'] = list(queryset.values_list('id', flat=True))
+        ids = queryset.values_list('id', flat=True)
+        request.session['device_ids'] = list(ids)
         url = 'admin:%s' % self.build_admin_url('send_message')
         return redirect(url)
     send_message_action.short_description = _("Send message")

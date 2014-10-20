@@ -7,12 +7,13 @@ from . import conf
 
 
 class GCMMessage(object):
-    
+
     def __init__(self):
         self.api_key = conf.GCM_APIKEY
 
         if not self.api_key:
-            raise ImproperlyConfigured("You haven't set the 'GCM_APIKEY' setting yet.")
+            raise ImproperlyConfigured(
+                "You haven't set the 'GCM_APIKEY' setting yet.")
 
     def _chunks(self, items, limit):
         """
@@ -24,11 +25,13 @@ class GCMMessage(object):
     def send(self, regs_id, data, collapse_key=None):
         """
         Send a GCM message for one or more devices, using json data
-        api_key: The API_KEY from your console (https://code.google.com/apis/console, locate Key for Server Apps in
+        api_key: The API_KEY from your console
+        (https://code.google.com/apis/console, locate Key for Server Apps in
             Google Cloud Messaging for Android)
         regs_id: A list with the devices which will be receiving a message
         data: The dict data which will be send
-        collapse_key: A string to group messages, look at the documentation about it:
+        collapse_key: A string to group messages, look at the documentation
+            about it:
             http://developer.android.com/google/gcm/gcm.html#request
         """
 
