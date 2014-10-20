@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models.query import QuerySet
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from . import conf
@@ -12,9 +13,9 @@ def get_device_model():
 
 
 class GCMMessage(api.GCMMessage):
-    GCM_INVALID_ID_ERRORS = [u'InvalidRegistration',
-                             u'NotRegistered',
-                             u'MismatchSenderId']
+    GCM_INVALID_ID_ERRORS = ['InvalidRegistration',
+                             'NotRegistered',
+                             'MismatchSenderId']
 
     def send(self, regs_id, data, collapse_key=None):
         response = super(GCMMessage, self).send(regs_id, data, collapse_key)
@@ -28,7 +29,7 @@ class GCMMessage(api.GCMMessage):
             invalid_messages = dict(filter(lambda x: x[1].get('error') in self.GCM_INVALID_ID_ERRORS,
                                            zip(regs_id, response.get('results'))))
 
-            for device in get_device_model().objects.filter(reg_id__in=invalid_messages.keys()):
+            for device in get_device_model().objects.filter(reg_id__in=list(invalid_messages.keys())):
                 device.mark_inactive(error_message=invalid_messages[device.reg_id]['error'])
 
 
@@ -49,6 +50,7 @@ class DeviceManager(models.Manager):
     get_query_set = get_queryset  # Django < 1.6 compatiblity
 
 
+@python_2_unicode_compatible
 class AbstractDevice(models.Model):
 
     dev_id = models.CharField(max_length=50, verbose_name=_("Device ID"), unique=True)
@@ -60,7 +62,7 @@ class AbstractDevice(models.Model):
 
     objects = DeviceManager()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.dev_id
 
     class Meta:

@@ -1,5 +1,9 @@
+from __future__ import unicode_literals
 import json
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 from django.contrib.auth import get_user_model
 from django.core import management
@@ -24,8 +28,8 @@ class CommandTest(TestCase):
     def test_gcm_urls(self):
         out = StringIO()
         management.call_command('gcm_urls', stdout=out)
-        self.assertIn(u'/gcm/v1/device/register', out.getvalue())
-        self.assertIn(u'/gcm/v1/device/unregister', out.getvalue())
+        self.assertIn('/gcm/v1/device/register', out.getvalue())
+        self.assertIn('/gcm/v1/device/unregister', out.getvalue())
 
     @patch.object(ApiGCMMessage, 'send')
     def test_send_message(self, mock_send):
@@ -33,8 +37,8 @@ class CommandTest(TestCase):
         device = Device.objects.create(dev_id='device_1', name=device_name, reg_id='000123abc001', is_active=True)
 
         mock_send.return_value = (Device.objects.values_list('reg_id', flat=True),
-                                  {u'failure': 0, u'canonical_ids': 0, u'success': 1, u'multicast_id': 112233,
-                                   u'results': [{u'message_id': u'0:123123'}]})
+                                  {'failure': 0, 'canonical_ids': 0, 'success': 1, 'multicast_id': 112233,
+                                   'results': [{'message_id': '0:123123'}]})
         out = StringIO()
         management.call_command('gcm_messenger', device.id, 'test', stdout=out)
         self.assertTrue(mock_send.called)
@@ -58,8 +62,8 @@ class AdminTest(TestCase):
         device = Device.objects.create(dev_id='device_1', reg_id='000123abc001', is_active=True)
 
         mock_send.return_value = (Device.objects.values_list('reg_id', flat=True),
-                                  {u'failure': 0, u'canonical_ids': 0, u'success': 1, u'multicast_id': 112233,
-                                   u'results': [{u'message_id': u'0:123123'}]})
+                                  {'failure': 0, 'canonical_ids': 0, 'success': 1, 'multicast_id': 112233,
+                                   'results': [{'message_id': '0:123123'}]})
 
         self.client.post('/admin/gcm/device/', data={'action': 'send_message_action',
                                                      '_selected_action': device.id})
@@ -153,11 +157,11 @@ class GCMMessageTest(TestCase):
         Device.objects.create(dev_id='device_3', reg_id='000123abc003', is_active=True)
 
         mock_send.return_value = (Device.objects.values_list('reg_id', flat=True),
-                                  {u'failure': 2, u'canonical_ids': 0, u'success': 1, u'multicast_id': 112233,
-                                   u'results': [
-                                       {u'error': u'InvalidRegistration'},
-                                       {u'message_id': u'0:123123'},
-                                       {u'error': u'NotRegistered'}]})
+                                  {'failure': 2, 'canonical_ids': 0, 'success': 1, 'multicast_id': 112233,
+                                   'results': [
+                                       {'error': 'InvalidRegistration'},
+                                       {'message_id': '0:123123'},
+                                       {'error': 'NotRegistered'}]})
 
         Device.objects.all().send_message('test message')
 
@@ -169,8 +173,8 @@ class GCMMessageTest(TestCase):
         Device.objects.create(dev_id='device_1', reg_id='000123abc001', is_active=True)
 
         mock_send.return_value = (Device.objects.values_list('reg_id', flat=True),
-                                  {u'failure': 1, u'canonical_ids': 0, u'success': 0, u'multicast_id': 112233,
-                                   u'results': [{u'error': u'UnhandledError'}]})
+                                  {'failure': 1, 'canonical_ids': 0, 'success': 0, 'multicast_id': 112233,
+                                   'results': [{'error': 'UnhandledError'}]})
 
         Device.objects.all().send_message('test message')
 
@@ -179,15 +183,15 @@ class GCMMessageTest(TestCase):
 
     @patch.object(ApiGCMMessage, 'send')
     def test_ignore_active_device(self, mock_send):
-        dev_id = u'device_1'
+        dev_id = 'device_1'
         device = Device.objects.create(dev_id=dev_id, reg_id='000123abc001', is_active=True)
 
         mock_send.return_value = (Device.objects.values_list('reg_id', flat=True),
-                                  {u'failure': 0, u'canonical_ids': 0, u'success': 1, u'multicast_id': 112233,
-                                   u'results': [{u'message_id': u'0:123123'}]})
+                                  {'failure': 0, 'canonical_ids': 0, 'success': 1, 'multicast_id': 112233,
+                                   'results': [{'message_id': '0:123123'}]})
 
         device.send_message('test message')
-        self.assertEqual(Device.objects.get(is_active=True).__unicode__(), dev_id)
+        self.assertEqual(str(Device.objects.get(is_active=True)), dev_id)
 
     @patch.object(ApiGCMMessage, 'send')
     def test_ignore_empty_queryset(self, mock_send):
@@ -206,12 +210,12 @@ class GCMMessageTest(TestCase):
         Device.objects.create(dev_id='device_5', reg_id='000123abc005', is_active=True)
 
         chunk_messages = [
-            {u'failure': 1, u'canonical_ids': 0, u'success': 0, u'multicast_id': 0003,
-             u'results': [{u'error': u'NotRegistered'}]},
-            {u'failure': 1, u'canonical_ids': 0, u'success': 1, u'multicast_id': 0002,
-             u'results': [{u'message_id': u'0:123123'}, {u'error': u'InvalidRegistration'}]},
-            {u'failure': 1, u'canonical_ids': 0, u'success': 1, u'multicast_id': 0001,
-             u'results': [{u'error': u'InvalidRegistration'}, {u'message_id': u'0:123123'}]}]
+            {'failure': 1, 'canonical_ids': 0, 'success': 0, 'multicast_id': '0003',
+             'results': [{'error': 'NotRegistered'}]},
+            {'failure': 1, 'canonical_ids': 0, 'success': 1, 'multicast_id': '0002',
+             'results': [{'message_id': '0:123123'}, {'error': 'InvalidRegistration'}]},
+            {'failure': 1, 'canonical_ids': 0, 'success': 1, 'multicast_id': '0001',
+             'results': [{'error': 'InvalidRegistration'}, {'message_id': '0:123123'}]}]
 
         def side_effect(**kwargs):
             mock = MagicMock()
