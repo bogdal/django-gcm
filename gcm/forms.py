@@ -8,7 +8,7 @@ class RegisterDeviceForm(forms.ModelForm):
 
     class Meta:
         model = get_device_model()
-        fields = ('dev_id', 'reg_id',)
+        fields = ('dev_id', 'reg_id', 'name',)
 
     def save(self, commit=True):
         self.instance.is_active = True
