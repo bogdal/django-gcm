@@ -7,6 +7,4 @@ gcm_api = Api(api_name='v1')
 gcm_api.register(DeviceResource())
 
 
-urlpatterns = patterns('',
-    url(r'^gcm/', include(gcm_api.urls)),
-)
+urlpatterns = patterns('', url(r'^gcm/', include(gcm_api.urls)))

@@ -1,7 +1,7 @@
 Sending messages
 ================
 
-You can simply use the console:
+Using ``console``:
 
 .. code-block:: bash
 
@@ -13,15 +13,34 @@ You can simply use the console:
     # python manage.py gcm_messenger <device_id> <message> [--collapse-key <key>]
     $ python manage.py gcm_messenger 1 'my test message'
 
-or django orm for that::
+Using ``Django orm``::
 
     from gcm.models import get_device_model
+    Device = get_device_model()
 
-    my_phone = get_device_model().objects.get(name='My phone')
+    my_phone = Device.objects.get(name='My phone')
     my_phone.send_message('my test message', collapse_key='something')
 
-In the above methods, ``collapse_key`` parameter is optional (default `message`).
+``collapse_key`` parameter is optional (default message).
 
-.. _Lifetime of a Message: http://developer.android.com/google/gcm/adv.html
+If you want to send additional arguments like ``delay_while_idle`` or other, add them as named variables e.g.::
 
-.. note:: For more information, see `Lifetime of a Message`_ docs.
+    my_phone.send_message('my test message', delay_while_idle=True, time_to_live=5)
+
+.. _Lifetime of a Message: https://developer.android.com/google/gcm/server.html#lifetime
+.. _Sending a downstream message: https://developer.android.com/google/gcm/server-ref.html#send-downstream
+
+.. note:: For more information, see `Lifetime of a Message`_ and `Sending a downstream message`_ docs.
+
+
+Multicast message
+-----------------
+
+``django-gcm`` supports sending message to multiple devices at once. E.g.::
+
+    from gcm.models import get_device_model
+    Device = get_device_model()
+    
+    Device.objects.all().send_message('my message')
+
+    

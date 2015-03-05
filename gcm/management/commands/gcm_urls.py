@@ -9,8 +9,9 @@ class Command(NoArgsCommand):
         self.stdout.write("%s\n" % ("-" * 30))
 
     def handle_noargs(self, **options):
-        register_url = reverse("register-device", kwargs={'resource_name': 'device', 'api_name': 'v1'})
-        unregister_url = reverse("unregister-device", kwargs={'resource_name': 'device', 'api_name': 'v1'})
+        url_kwargs = {'resource_name': 'device', 'api_name': 'v1'}
+        register_url = reverse("register-device", kwargs=url_kwargs)
+        unregister_url = reverse("unregister-device", kwargs=url_kwargs)
 
         self.show_line()
         self.stdout.write("GCM urls:\n")
