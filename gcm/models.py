@@ -17,8 +17,8 @@ class GCMMessage(api.GCMMessage):
                              'NotRegistered',
                              'MismatchSenderId']
 
-    def send(self, regs_id, data, collapse_key=None):
-        response = super(GCMMessage, self).send(regs_id, data, collapse_key)
+    def send(self, regs_id, data, **kwargs):
+        response = super(GCMMessage, self).send(regs_id, data, **kwargs)
         chunks = [response] if not isinstance(response, list) else response
         for chunk in chunks:
             self.post_send(*chunk)
@@ -38,12 +38,11 @@ class GCMMessage(api.GCMMessage):
 
 class DeviceQuerySet(QuerySet):
 
-    def send_message(self, data, collapse_key="message"):
+    def send_message(self, data, **kwargs):
         if self:
             return GCMMessage().send(
                 regs_id=list(self.values_list("reg_id", flat=True)),
-                data=data,
-                collapse_key=collapse_key)
+                data=data, **kwargs)
 
 
 class DeviceManager(models.Manager):
@@ -80,11 +79,8 @@ class AbstractDevice(models.Model):
         verbose_name_plural = _("Devices")
         ordering = ['-modified_date']
 
-    def send_message(self, data, collapse_key="message"):
-        return GCMMessage().send(
-            regs_id=[self.reg_id],
-            data=data,
-            collapse_key=collapse_key)
+    def send_message(self, data, **kwargs):
+        return GCMMessage().send(regs_id=[self.reg_id], data=data, **kwargs)
 
     def mark_inactive(self, **kwargs):
         self.is_active = False
