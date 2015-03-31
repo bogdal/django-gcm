@@ -1,43 +1,32 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+
+from django.db import models, migrations
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Device'
-        db.create_table(u'gcm_device', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('dev_id', self.gf('django.db.models.fields.CharField')(unique=True, max_length=50)),
-            ('reg_id', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('creation_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('modified_date', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('is_active', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal(u'gcm', ['Device'])
+    dependencies = [
+    ]
 
-
-    def backwards(self, orm):
-        # Deleting model 'Device'
-        db.delete_table(u'gcm_device')
-
-
-    models = {
-        u'gcm.device': {
-            'Meta': {'ordering': "['-modified_date']", 'object_name': 'Device'},
-            'creation_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'dev_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '50'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'modified_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'reg_id': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'})
-        }
-    }
-
-    complete_apps = ['gcm']
+    operations = [
+        migrations.CreateModel(
+            name='Device',
+            fields=[
+                ('id', models.AutoField(primary_key=True, auto_created=True, serialize=False, verbose_name='ID')),
+                ('dev_id', models.CharField(unique=True, verbose_name='Device ID', max_length=50)),
+                ('reg_id', models.CharField(unique=True, verbose_name='Registration ID', max_length=255)),
+                ('name', models.CharField(null=True, blank=True, verbose_name='Name', max_length=255)),
+                ('creation_date', models.DateTimeField(auto_now_add=True, verbose_name='Creation date')),
+                ('modified_date', models.DateTimeField(verbose_name='Modified date', auto_now=True)),
+                ('is_active', models.BooleanField(verbose_name='Is active?', default=False)),
+            ],
+            options={
+                'ordering': ['-modified_date'],
+                'verbose_name_plural': 'Devices',
+                'abstract': False,
+                'verbose_name': 'Device',
+            },
+            bases=(models.Model,),
+        ),
+    ]
