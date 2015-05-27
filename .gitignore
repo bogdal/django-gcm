@@ -8,3 +8,5 @@ database.db
 dist
 *.egg-info
 .coverage
+.tox
+htmlcov
