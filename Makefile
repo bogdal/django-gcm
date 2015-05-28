@@ -1,5 +1,5 @@
 install:
-	pip install -e .[dev] --upgrade
+	pip install -e .[dev] --upgrade --process-dependency-links
 	pip install tox
 
 test:
