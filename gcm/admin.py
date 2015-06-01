@@ -35,7 +35,7 @@ class DeviceAdmin(admin.ModelAdmin):
 
     def build_admin_url(self, url_name):
         return '%s_%s_%s' % (self.model._meta.app_label,
-                             self.model._meta.module_name,
+                             self.model._meta.model_name,
                              url_name)
 
     def send_message_view(self, request):

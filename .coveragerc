@@ -2,6 +2,7 @@
 branch = 1
 omit =
     gcm/migrations/*
+    gcm/south_migrations/*
     gcm/tests.py
 source = gcm
 

@@ -1,4 +1,4 @@
-from django.utils.importlib import import_module
+from django.utils.module_loading import import_module
 
 
 def load_object(object_path):
