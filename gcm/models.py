@@ -1,11 +1,17 @@
+import logging
+
 from django.db import models
 from django.db.models.query import QuerySet
 from django.utils.encoding import python_2_unicode_compatible
+
 from django.utils.translation import ugettext_lazy as _
 
 from . import conf
 from . import api
 from .utils import load_object
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_device_model():
@@ -85,6 +91,9 @@ class AbstractDevice(models.Model):
     def mark_inactive(self, **kwargs):
         self.is_active = False
         self.save()
+        if kwargs.get('error_message'):
+            logger.debug("Device %s (%s) marked inactive due to error: %s",
+                         self.dev_id, self.name, kwargs['error_message'])
 
 
 class Device(AbstractDevice):
