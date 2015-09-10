@@ -22,10 +22,10 @@ class GCMMessage(object):
         for i in range(0, len(items), limit):
             yield items[i:i + limit]
 
-    def send(self, regs_id, data, **kwargs):
+    def send(self, data, registration_ids=None, **kwargs):
         """
         Send a GCM message for one or more devices, using json data
-        regs_id: A list with the devices which will be receiving a message
+        registration_ids: A list with the devices which will be receiving a message
         data: The dict data which will be send
         Optional params e.g.:
             collapse_key: A string to group messages
@@ -36,16 +36,20 @@ class GCMMessage(object):
         if not isinstance(data, dict):
             data = {'msg': data}
 
-        if len(regs_id) > conf.GCM_MAX_RECIPIENTS:
+        registration_ids = registration_ids or []
+
+        if len(registration_ids) > conf.GCM_MAX_RECIPIENTS:
             ret = []
-            for chunk in self._chunks(regs_id, conf.GCM_MAX_RECIPIENTS):
-                ret.append(self.send(chunk, data, **kwargs))
+            for chunk in self._chunks(
+                    registration_ids, conf.GCM_MAX_RECIPIENTS):
+                ret.append(self.send(data, registration_ids=chunk, **kwargs))
             return ret
 
         values = {
-            'registration_ids': regs_id,
             'data': data,
             'collapse_key': 'message'}
+        if registration_ids:
+            values.update({'registration_ids': registration_ids})
         values.update(kwargs)
 
         values = json.dumps(values)
@@ -55,8 +59,9 @@ class GCMMessage(object):
             'Content-Type': 'application/json',
             'Authorization': 'key=' + self.api_key}
 
-        response = requests.post(url="https://android.googleapis.com/gcm/send",
-                                 data=values,
-                                 headers=headers)
+        response = requests.post(
+            url="https://gcm-http.googleapis.com/gcm/send",
+            data=values, headers=headers)
+
         response.raise_for_status()
-        return regs_id, json.loads(response.content)
+        return registration_ids, json.loads(response.content)

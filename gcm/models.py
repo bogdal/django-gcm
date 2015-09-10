@@ -23,18 +23,19 @@ class GCMMessage(api.GCMMessage):
                              'NotRegistered',
                              'MismatchSenderId']
 
-    def send(self, regs_id, data, **kwargs):
-        response = super(GCMMessage, self).send(regs_id, data, **kwargs)
+    def send(self, data, registration_ids=None, **kwargs):
+        response = super(GCMMessage, self).send(
+            data, registration_ids=registration_ids, **kwargs)
         chunks = [response] if not isinstance(response, list) else response
         for chunk in chunks:
             self.post_send(*chunk)
         return response
 
-    def post_send(self, regs_id, response):
-        if response['failure']:
+    def post_send(self, registration_ids, response):
+        if response.get('failure'):
             invalid_messages = dict(filter(
                 lambda x: x[1].get('error') in self.GCM_INVALID_ID_ERRORS,
-                zip(regs_id, response.get('results'))))
+                zip(registration_ids, response.get('results'))))
 
             regs = list(invalid_messages.keys())
             for device in get_device_model().objects.filter(reg_id__in=regs):
@@ -46,9 +47,9 @@ class DeviceQuerySet(QuerySet):
 
     def send_message(self, data, **kwargs):
         if self:
+            registration_ids = list(self.values_list("reg_id", flat=True))
             return GCMMessage().send(
-                regs_id=list(self.values_list("reg_id", flat=True)),
-                data=data, **kwargs)
+                data, registration_ids=registration_ids, **kwargs)
 
 
 class DeviceManager(models.Manager):
@@ -86,7 +87,8 @@ class AbstractDevice(models.Model):
         ordering = ['-modified_date']
 
     def send_message(self, data, **kwargs):
-        return GCMMessage().send(regs_id=[self.reg_id], data=data, **kwargs)
+        return GCMMessage().send(
+            registration_ids=[self.reg_id], data=data, **kwargs)
 
     def mark_inactive(self, **kwargs):
         self.is_active = False
