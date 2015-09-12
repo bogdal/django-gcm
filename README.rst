@@ -18,7 +18,7 @@ Quickstart
 
 Install the package via ``pip``::
 
-    pip install django-gcm --process-dependency-links
+    pip install django-gcm
     
 Add ``gcm`` to ``INSTALLED_APPS`` in ``settings.py``
 
