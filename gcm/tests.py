@@ -136,15 +136,21 @@ class DeviceResourceTest(ResourceTestCase):
 
     def test_unregister_device(self):
         device_id = 'TEST001'
-        data = {
-            'dev_id': device_id,
-        }
+        data = {'dev_id': device_id}
+        Device.objects.create(dev_id=device_id, reg_id='abc1')
         response = self.api_client.post(self.api_unregister_url, data=data)
         self.assertHttpOK(response)
 
         devices = Device.objects.filter(dev_id=device_id)
         self.assertEqual(devices.count(), 1)
         self.assertFalse(list(devices).pop().is_active)
+
+    def test_cannot_unregister_non_existent_device(self):
+        device_id = 'FAKE_DEVICE_ID'
+        data = {'dev_id': device_id}
+        response = self.api_client.post(self.api_unregister_url, data=data)
+        self.assertHttpBadRequest(response)
+        self.assertEqual(Device.objects.all().count(), 0)
 
     def test_register_device_without_id(self):
         response = self.api_client.post(self.api_register_url, data={})
@@ -218,6 +224,23 @@ class GCMMessageTest(TestCase):
 
         device.send_message('test message')
         self.assertEqual(str(Device.objects.get(is_active=True)), dev_id)
+
+    @patch('requests.post')
+    def test_send_message_to_topic(self, mocked_post):
+        post = MagicMock()
+        post.content = '{}'
+        post.status_code = 200
+        mocked_post.return_value = post
+        gcm_message = ApiGCMMessage()
+        message = 'test message'
+        topic = '/topics/test-topic'
+        gcm_message.send(message, to=topic)
+        expected_data = {
+            'data': {'msg': message},
+            'to': topic,
+            'collapse_key': 'message'}
+        self.assertDictEqual(
+            json.loads(mocked_post.call_args[1]['data']), expected_data)
 
     @patch.object(ApiGCMMessage, 'send')
     def test_ignore_empty_queryset(self, mock_send):

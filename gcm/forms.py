@@ -21,6 +21,12 @@ class UnregisterDeviceForm(forms.ModelForm):
         model = get_device_model()
         fields = ('dev_id',)
 
+    def clean(self):
+        if not self.instance.pk:
+            raise forms.ValidationError(
+                "Device '%s' does not exist" % self.cleaned_data['dev_id'])
+        return self.cleaned_data
+
     def save(self, commit=True):
         self.instance.mark_inactive()
         return super(UnregisterDeviceForm, self).save(commit)
