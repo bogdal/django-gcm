@@ -36,11 +36,23 @@ If you want to send additional arguments like ``delay_while_idle`` or other, add
 Multicast message
 -----------------
 
-``django-gcm`` supports sending message to multiple devices at once. E.g.::
+``django-gcm`` supports sending messages to multiple devices at once. E.g.::
 
     from gcm.models import get_device_model
     Device = get_device_model()
     
     Device.objects.all().send_message('my message')
 
-    
+
+Topic messaging
+-----------------------
+
+``django-gcm`` supports sending messages to multiple devices that have opted in to a particular gcm topic::
+
+    from gcm.api import GCMMessage
+
+    GCMMessage().send('my message', to='/topics/my-topic')
+
+.. _Send messages to topics: https://developers.google.com/cloud-messaging/topic-messaging
+
+.. note:: For more information, see `Send messages to topics`_.
