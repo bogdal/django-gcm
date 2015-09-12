@@ -22,3 +22,4 @@ Contents:
    signals.rst
    extending_device.rst
    authentication.rst
+   registration.rst
