@@ -2,6 +2,7 @@ import requests
 import json
 
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.encoding import force_text
 
 from . import conf
 
@@ -64,4 +65,4 @@ class GCMMessage(object):
             data=values, headers=headers)
 
         response.raise_for_status()
-        return registration_ids, json.loads(response.content.decode("utf-8"))
+        return registration_ids, json.loads(force_text(response.content))
