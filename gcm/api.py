@@ -64,4 +64,4 @@ class GCMMessage(object):
             data=values, headers=headers)
 
         response.raise_for_status()
-        return registration_ids, json.loads(response.content)
+        return registration_ids, json.loads(response.content.decode("utf-8"))
