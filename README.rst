@@ -33,11 +33,11 @@ Add ``gcm urls`` to ``urls.py`` file:
 
 .. code-block:: python
 
-    urlpatterns = patterns('',
+    urlpatterns = [
       ...
       url(r'', include('gcm.urls')),
       ...
-    )
+    ]
 
 
 Documentation: `https://django-gcm.readthedocs.org <https://django-gcm.readthedocs.org>`_

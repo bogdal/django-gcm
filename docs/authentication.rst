@@ -76,7 +76,7 @@ You need to hook your resource class up in your ``urls.py`` file:
 .. code-block:: python
 
     # your_app/urls.py
-    from django.conf.urls import patterns, include, url
+    from django.conf.urls import include, url
     from tastypie.api import Api
     from .resources import AuthResource
 
@@ -84,9 +84,9 @@ You need to hook your resource class up in your ``urls.py`` file:
     gcm_api.register(AuthResource())
 
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^gcm/', include(gcm_api.urls)),
-    )
+    ]
 
 
 Include your ``urls.py`` file in the main URL router:
@@ -94,11 +94,11 @@ Include your ``urls.py`` file in the main URL router:
 .. code-block:: python
 
     # urls.py
-    from django.conf.urls import include, patterns, url
+    from django.conf.urls import include, url
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'', include('your_app.urls')),
-    )
+    ]
 
 
 .. note:: See an example project ``gcm/example/apikeyauth_project``

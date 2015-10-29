@@ -10,11 +10,11 @@ Quickstart
 #. Add `django-gcm` resources to your URL router::
 
       # urls.py
-      from django.conf.urls import include, patterns, url
+      from django.conf.urls import include, url
 
-      urlpatterns = patterns('',
+      urlpatterns = [
           url(r'', include('gcm.urls')),
-      )
+      ]
 
 
    To check gcm urls just use the following command:
