@@ -19,13 +19,13 @@ Using ``Django orm``::
     Device = get_device_model()
 
     my_phone = Device.objects.get(name='My phone')
-    my_phone.send_message('my test message', collapse_key='something')
+    my_phone.send_message({'message':'my test message'}, collapse_key='something')
 
 ``collapse_key`` parameter is optional (default message).
 
 If you want to send additional arguments like ``delay_while_idle`` or other, add them as named variables e.g.::
 
-    my_phone.send_message('my test message', delay_while_idle=True, time_to_live=5)
+    my_phone.send_message({'message':'my test message'}, delay_while_idle=True, time_to_live=5)
 
 .. _Lifetime of a Message: https://developer.android.com/google/gcm/server.html#lifetime
 .. _Sending a downstream message: https://developer.android.com/google/gcm/server-ref.html#send-downstream
@@ -41,7 +41,7 @@ Multicast message
     from gcm.models import get_device_model
     Device = get_device_model()
     
-    Device.objects.all().send_message('my message')
+    Device.objects.all().send_message({'message':'my test message'})
 
 
 Topic messaging
@@ -51,7 +51,7 @@ Topic messaging
 
     from gcm.api import GCMMessage
 
-    GCMMessage().send('my message', to='/topics/my-topic')
+    GCMMessage().send({'message':'my test message'}, to='/topics/my-topic')
 
 .. _Send messages to topics: https://developers.google.com/cloud-messaging/topic-messaging
 
