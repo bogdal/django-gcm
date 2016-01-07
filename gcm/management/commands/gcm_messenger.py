@@ -51,7 +51,7 @@ class Command(BaseCommand):
                     'python manage.py gcm_messenger --devices' % id)
             else:
                 result = device.send_message(
-                    message, collapse_key=collapse_key)
+                        {'message': message}, collapse_key=collapse_key)
 
                 self.stdout.write("[OK] device #%s (%s): %s\n" %
                                   (id, device.name, result))
