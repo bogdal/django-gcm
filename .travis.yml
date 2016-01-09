@@ -12,11 +12,6 @@ env:
   - TOXENV=py27-django18
   - TOXENV=py27-django19
   - TOXENV=py27-django_master
-  - TOXENV=py33-django16
-  - TOXENV=py33-django17
-  - TOXENV=py33-django18
-  - TOXENV=py33-django19
-  - TOXENV=py33-django_master
   - TOXENV=py34-django16
   - TOXENV=py34-django17
   - TOXENV=py34-django18
@@ -28,12 +23,7 @@ env:
 
 matrix:
   allow_failures:
-    - env: TOXENV=py27-django19
-    - env: TOXENV=py33-django19
-    - env: TOXENV=py34-django19
-    - env: TOXENV=py35-django19
     - env: TOXENV=py27-django_master
-    - env: TOXENV=py33-django_master
     - env: TOXENV=py34-django_master
     - env: TOXENV=py35-django_master
 
