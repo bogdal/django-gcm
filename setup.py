@@ -29,10 +29,13 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules'],
     zip_safe=False,
     install_requires=[
-        'django>=1.6',
-        'django-tastypie>=0.12.2',
+        'django>=1.7',
+        'django-tastypie>=0.12.3a0',
         'pytz>=2013.8',
         'requests>=1.2.0',
+    ],
+    dependency_links=[
+        'https://github.com/django-tastypie/django-tastypie/tarball/f0d07abd12432df7c77f9527f5d3d211e7a68797#egg=django-tastypie-0.12.3a0',
     ],
     extras_require={
         'dev': [
