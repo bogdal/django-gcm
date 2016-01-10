@@ -19,18 +19,16 @@ class DeviceAdmin(admin.ModelAdmin):
     actions = ['send_message_action']
 
     def get_urls(self):
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         def wrap(view):
             def wrapper(*args, **kwargs):
                 return self.admin_site.admin_view(view)(*args, **kwargs)
             return update_wrapper(wrapper, view)
 
-        urlpatterns = patterns(
-            '',
+        urlpatterns = [
             url(r'^send-message/$', wrap(self.send_message_view),
-                name=self.build_admin_url('send_message')),
-        )
+                name=self.build_admin_url('send_message'))]
         return urlpatterns + super(DeviceAdmin, self).get_urls()
 
     def build_admin_url(self, url_name):
