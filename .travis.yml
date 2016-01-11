@@ -1,7 +1,7 @@
 language: python
 
 install:
-  - pip install tox coveralls
+  - pip install tox codecov
 
 script:
   - tox
@@ -25,7 +25,7 @@ matrix:
     - env: TOXENV=py34-django_master
     - env: TOXENV=py35-django_master
 
-after_success: coveralls
+after_success: codecov
 
 addons:
   apt:
