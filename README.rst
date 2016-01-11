@@ -1,13 +1,16 @@
 django-gcm
 ==========
 
-.. image:: https://travis-ci.org/bogdal/django-gcm.png?branch=master
+.. image:: https://img.shields.io/travis/bogdal/django-gcm/master.svg
     :target: https://travis-ci.org/bogdal/django-gcm
 
-.. image:: https://codecov.io/github/bogdal/django-gcm/coverage.svg?branch=master
+.. image:: https://img.shields.io/codecov/c/github/bogdal/django-gcm/master.svg
     :target: https://codecov.io/github/bogdal/django-gcm?branch=master
+    
+.. image:: https://requires.io/github/bogdal/django-gcm/requirements.svg?branch=master
+    :target: https://requires.io/github/bogdal/django-gcm/requirements/?branch=master
 
-.. image:: https://version-image.appspot.com/pypi/?name=django-gcm
+.. image:: https://img.shields.io/pypi/v/django-gcm.svg
     :target: https://pypi.python.org/pypi/django-gcm/
     
 
