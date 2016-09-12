@@ -10,20 +10,6 @@ class Command(BaseCommand):
     args = '<device_id message>'
     help = 'Send message through gcm api'
 
-    option_list = BaseCommand.option_list + (
-        make_option(
-            '--devices',
-            action='store_true',
-            dest='devices',
-            default=False,
-            help='List of available devices'),
-        make_option(
-            '--collapse-key',
-            dest='collapse_key',
-            default='message',
-            help='Set value of collapse_key flag, default is "message"'),
-        )
-
     def add_arguments(self, parser):
         parser.add_argument('device_id', nargs='+', type=int)
         parser.add_argument('message', nargs='+', type=str)
