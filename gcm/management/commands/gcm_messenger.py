@@ -24,6 +24,23 @@ class Command(BaseCommand):
             help='Set value of collapse_key flag, default is "message"'),
         )
 
+    def add_arguments(self, parser):
+        parser.add_argument('device_id', nargs='+', type=int)
+        parser.add_argument('message', nargs='+', type=str)
+        parser.add_argument(
+            '--devices',
+            action='store_true',
+            dest='devices',
+            default=False,
+            help='List of available devices'
+        )
+        parser.add_argument(
+            '--collapse-key',
+            dest='collapse_key',
+            default='message',
+            help='Set value of collapse_key flag, default is "message"'
+        )
+
     def handle(self, *args, **options):
 
         if options['devices']:
@@ -36,8 +53,8 @@ class Command(BaseCommand):
         else:
             collapse_key = options['collapse_key']
             try:
-                id = args[0]
-                message = args[1]
+                id = options['device_id']
+                message = options['message']
             except IndexError:
                 raise CommandError(
                     "Invalid params. You have to put all params: "
