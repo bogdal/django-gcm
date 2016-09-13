@@ -43,7 +43,7 @@ class CommandTest(TestCase):
              'multicast_id': 112233, 'results': [{'message_id': '0:123123'}]})
 
         out = StringIO()
-        management.call_command('gcm_messenger', device.id, 'test', stdout=out)
+        management.call_command('gcm_messenger', device_id=device.id, message='test', stdout=out)
         self.assertTrue(mock_send.called)
 
         management.call_command('gcm_messenger', devices=True, stdout=out)

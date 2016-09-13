@@ -1,14 +1,14 @@
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from django.core.urlresolvers import reverse
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = "Show GCM urls"
 
     def show_line(self):
         self.stdout.write("%s\n" % ("-" * 30))
 
-    def handle_noargs(self, **options):
+    def handle(self, *args, **options):
         url_kwargs = {'resource_name': 'device', 'api_name': 'v1'}
         register_url = reverse("register-device", kwargs=url_kwargs)
         unregister_url = reverse("unregister-device", kwargs=url_kwargs)
