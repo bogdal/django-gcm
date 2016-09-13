@@ -29,7 +29,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        if options['devices']:
+        if options.get('devices', False):
             devices = Device.objects.filter(is_active=True)
 
             self.stdout.write("Devices list:\n")
@@ -37,11 +37,11 @@ class Command(BaseCommand):
                 self.stdout.write("(#%s) %s\n" % (device.id, device.name))
             self.stdout.write("\n")
         else:
-            collapse_key = options['collapse_key']
-            try:
-                id = options['device_id']
-                message = options['message']
-            except IndexError:
+            collapse_key = options.get('collapse_key', 'message')
+            id = options.get('device_id')
+            message = options.get('message')
+
+            if not (id and message):
                 raise CommandError(
                     "Invalid params. You have to put all params: "
                     "python manage.py gcm_messenger <device_id> <msg>")
