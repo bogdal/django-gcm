@@ -11,8 +11,8 @@ class Command(BaseCommand):
     help = 'Send message through gcm api'
 
     def add_arguments(self, parser):
-        parser.add_argument('device_id', nargs='+', type=int)
-        parser.add_argument('message', nargs='+', type=str)
+        parser.add_argument('device_id', nargs='?', type=int)
+        parser.add_argument('message', nargs='?', type=str)
         parser.add_argument(
             '--devices',
             action='store_true',
